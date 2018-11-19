@@ -1,5 +1,4 @@
 package com.example.justdoit.connect;
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
@@ -78,8 +77,8 @@ public class ThumbnailDownloader<T> extends HandlerThread {
             if (url == null) {
                 return;
             }
-            String webAntUrl = "http://gallery.dev.webant.ru/media/";
-            byte[] bitmapBytes = new FlickrFetchr().getUrlBytes(webAntUrl+url);
+
+            byte[] bitmapBytes = new FlickrFetchr().getUrlBytes(url);
             final Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapBytes, 0, bitmapBytes.length);
             Log.i(TAG, "Bitmap created");
 

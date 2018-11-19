@@ -17,31 +17,31 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.example.justdoit.connect.FlickrFetchr;
 import com.example.justdoit.GalleryItem;
 import com.example.justdoit.R;
+import com.example.justdoit.connect.FlickrFetchr;
 import com.example.justdoit.connect.ThumbnailDownloader;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PhotoGalleryFragment extends Fragment {
+public class AllGalleryFragment extends Fragment {
 
-    private static final String TAG = "PhotoGalleryFragment";
+    private static final String TAG = "AllGalleryFragment";
 
     private RecyclerView mPhotoRecyclerView;
     private List<GalleryItem> mItems = new ArrayList<>();
     private ThumbnailDownloader<PhotoHolder> mThumbnailDownloader;
 
-    public static PhotoGalleryFragment newInstance() {
-        return new PhotoGalleryFragment();
+    public static AllGalleryFragment newInstance() {
+        return new AllGalleryFragment();
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        new FetchItemTask().execute();
+        new MyTask().execute();
 
         Handler responseHandler = new Handler();
         mThumbnailDownloader = new ThumbnailDownloader<>(responseHandler);
@@ -127,8 +127,6 @@ public class PhotoGalleryFragment extends Fragment {
         @Override
         public void onBindViewHolder(@NonNull PhotoHolder photoHolder, int i) {
             GalleryItem galleryItem = mGalleryItems.get(i);
-            Drawable placeholder = getResources().getDrawable(R.drawable.bill_up_close);
-            photoHolder.bindDrawable(placeholder);
             mThumbnailDownloader.queueThumbnail(photoHolder, galleryItem.getUrl());
         }
 
@@ -138,19 +136,20 @@ public class PhotoGalleryFragment extends Fragment {
         }
     }
 
-    private class FetchItemTask extends AsyncTask<Void, Void, List<GalleryItem>> {
+    private class MyTask extends AsyncTask<Void, Void, List<GalleryItem>> {
+
+        String response = null;
 
         @Override
         protected List<GalleryItem> doInBackground(Void... voids) {
-            return new FlickrFetchr().fetchItems();
+            return new FlickrFetchr().fetchItems("http://gallery.dev.webant.ru/api/photos");
         }
 
         @Override
         protected void onPostExecute(List<GalleryItem> items) {
             mItems = items;
             setupAdapter();
+            Log.i(TAG, String.valueOf(mItems));
         }
     }
-
-
 }

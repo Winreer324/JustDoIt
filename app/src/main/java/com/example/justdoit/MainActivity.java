@@ -1,59 +1,84 @@
 package com.example.justdoit;
 
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
 
-import com.example.justdoit.adapter.SampleFragmentPagerAdapter;
+import com.example.justdoit.adapter.SectionsPageAdapter;
+import com.example.justdoit.fragment.AllGalleryFragment;
+import com.example.justdoit.fragment.NewGalleryFragment;
+import com.example.justdoit.fragment.PopularGalleryFragment;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+public class MainActivity extends SingleFragmentActivity {
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+    private static final String TAG = "MainActivity";
 
-public class MainActivity extends AppCompatActivity {
-    protected static final String TAG = "WebAnt";
+    private SectionsPageAdapter mSectionsPageAdapter;
+
+    private ViewPager mViewPager;
+
+    @Override
+    protected Fragment createFragment() {
+        return  AllGalleryFragment.newInstance();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
-        setContentView(R.layout.tab);
-//        Button btn = (Button) findViewById(R.id.btn);
-        ViewPager viewPager = findViewById(R.id.viewpager);
-        viewPager.setAdapter(
-                new SampleFragmentPagerAdapter(getSupportFragmentManager(), MainActivity.this));
+        setContentView(R.layout.activity_main);
 
-        // Передаём ViewPager в TabLayout
-        TabLayout tabLayout = findViewById(R.id.sliding_tabs);
-        tabLayout.setupWithViewPager(viewPager);
+        Log.d(TAG, "OnCreate: Starting.");
+
+        mSectionsPageAdapter = new SectionsPageAdapter(getSupportFragmentManager());
+        mViewPager = (ViewPager) findViewById(R.id.container);
+        setupViewPager(mViewPager);
+
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(mViewPager);
     }
 
-//        View.OnClickListener click = new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                  new ParseTask().execute();
-//                 Toast.makeText(MainActivity.this, "Hello Android 7",Toast.LENGTH_LONG).show();
-//            }
-//        };
-//        btn.setOnClickListener(click);
+    private void setupViewPager(ViewPager viewPager) {
+        SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager());
+        adapter.addFragment(new AllGalleryFragment(), "All");
+        adapter.addFragment(new PopularGalleryFragment(), "Popular",R.drawable.fire);
+        adapter.addFragment(new NewGalleryFragment(), "New",R.drawable.file_document_box);
+        viewPager.setAdapter(adapter);
+    }
+
+}
+
+
+//public class MainActivity extends AppCompatActivity {
+//    protected static final String TAG = "WebAnt";
+//    Button btnNewMain;
+//    @Override
+//    protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+////        setContentView(R.layout.activity_main);
+//        setContentView(R.layout.tab);
+////        Button btn = (Button) findViewById(R.id.btn);
+//        ViewPager viewPager = findViewById(R.id.viewpager);
+//        viewPager.setAdapter(
+//                new SampleFragmentPagerAdapter(getSupportFragmentManager(), MainActivity.this));
+//
+//        // Передаём ViewPager в TabLayout
+//        TabLayout tabLayout = findViewById(R.id.sliding_tabs);
+//        tabLayout.setupWithViewPager(viewPager);
+//
+////        btnNewMain = (Button) findViewById(R.id.btnPopularyMain);
+////
+////        View.OnClickListener clickPopulary = new View.OnClickListener() {
+////            @Override
+////            public void onClick(View v) {
+////                Intent intent = new Intent(MainActivity.this,PopularyActivity.class);
+////                startActivity(intent);
+//////                  new ParseTask().execute();
+//////                 Toast.makeText(MainActivity.this, "Hello Android 7",Toast.LENGTH_LONG).show();
+////            }
+////        };
+////        btnNewMain.setOnClickListener(clickPopulary);
 //    }
 
 //    private class ParseTask extends AsyncTask<Void, Void, String> {
@@ -157,4 +182,4 @@ public class MainActivity extends AppCompatActivity {
 //                }
 //        }
 //    }
-}
+//}

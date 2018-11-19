@@ -1,6 +1,5 @@
 package com.example.justdoit.fragment;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -26,30 +25,30 @@ import com.example.justdoit.connect.ThumbnailDownloader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PhotoPopularyFragment extends Fragment {
+public class PopularGalleryFragment extends Fragment {
 
-    private static final String TAG = "PhotoGalleryFragment";
+    private static final String TAG = "PopularGalleryFragment";
 
     private RecyclerView mPhotoRecyclerView;
     private List<GalleryItem> mItems = new ArrayList<>();
-    private ThumbnailDownloader<PhotoHolder> mThumbnailDownloader;
+    private ThumbnailDownloader<PopularGalleryFragment.PhotoHolder> mThumbnailDownloader;
 
-    public static PhotoPopularyFragment newInstance() {
-        return new PhotoPopularyFragment();
+    public static PopularGalleryFragment newInstance() {
+        return new PopularGalleryFragment();
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        new FetchItemTask().execute();
+        new PopularGalleryFragment.MyTask().execute();
 
         Handler responseHandler = new Handler();
         mThumbnailDownloader = new ThumbnailDownloader<>(responseHandler);
         mThumbnailDownloader.setThumbnailDownloadListener(
-                new ThumbnailDownloader.ThumbnailDownloadListener<PhotoHolder>() {
+                new ThumbnailDownloader.ThumbnailDownloadListener<PopularGalleryFragment.PhotoHolder>() {
                     @Override
-                    public void onThumbnailDownloaded(PhotoHolder photoHolder, Bitmap bitmap) {
+                    public void onThumbnailDownloaded(PopularGalleryFragment.PhotoHolder photoHolder, Bitmap bitmap) {
                         Drawable drawable = new BitmapDrawable(getResources(), bitmap);
                         photoHolder.bindDrawable(drawable);
                     }
@@ -90,7 +89,7 @@ public class PhotoPopularyFragment extends Fragment {
 
     private void setupAdapter() {
         if (isAdded()) {
-            mPhotoRecyclerView.setAdapter(new PhotoAdapter(mItems));
+            mPhotoRecyclerView.setAdapter(new PopularGalleryFragment.PhotoAdapter(mItems));
         }
     }
 
@@ -109,7 +108,7 @@ public class PhotoPopularyFragment extends Fragment {
         }
     }
 
-    private class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder> {
+    private class PhotoAdapter extends RecyclerView.Adapter<PopularGalleryFragment.PhotoHolder> {
 
         private List<GalleryItem> mGalleryItems;
 
@@ -119,17 +118,15 @@ public class PhotoPopularyFragment extends Fragment {
 
         @NonNull
         @Override
-        public PhotoHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        public PopularGalleryFragment.PhotoHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
             LayoutInflater inflater = LayoutInflater.from(getActivity());
             View view = inflater.inflate(R.layout.gallery_item, viewGroup, false);
-            return new PhotoHolder(view);
+            return new PopularGalleryFragment.PhotoHolder(view);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull PhotoHolder photoHolder, int i) {
+        public void onBindViewHolder(@NonNull PopularGalleryFragment.PhotoHolder photoHolder, int i) {
             GalleryItem galleryItem = mGalleryItems.get(i);
-            Drawable placeholder = getResources().getDrawable(R.drawable.bill_up_close);
-            photoHolder.bindDrawable(placeholder);
             mThumbnailDownloader.queueThumbnail(photoHolder, galleryItem.getUrl());
         }
 
@@ -139,53 +136,21 @@ public class PhotoPopularyFragment extends Fragment {
         }
     }
 
-    private class FetchItemTask extends AsyncTask<Void, Void, List<GalleryItem>> {
+    private class MyTask extends AsyncTask<Void, Void, List<GalleryItem>> {
+
+        String response = null;
 
         @Override
         protected List<GalleryItem> doInBackground(Void... voids) {
-            return new FlickrFetchr().fetchItems();
+            return new FlickrFetchr().fetchItems("http://gallery.dev.webant.ru/api/photos?popular=true");
         }
 
         @Override
         protected void onPostExecute(List<GalleryItem> items) {
             mItems = items;
             setupAdapter();
+            Log.i(TAG, String.valueOf(mItems));
         }
     }
 
-    private static final int LAYOUT = R.layout.fragment_photo_populary;
-
-    public static PhotoPopularyFragment getInstance(Context context) {
-        Bundle args = new Bundle();
-
-        PhotoPopularyFragment fragment = new PhotoPopularyFragment();
-        fragment.setArguments(args);
-//        fragment.setContext(context);
-
-        return fragment;
-    }
-
-//    @Nullable
-//    @Override
-//    public View onCreateView(@NonNull LayoutInflater inflater,
-//                             @Nullable ViewGroup container,
-//                             @Nullable Bundle savedInstanceState) {
-//        view = inflater.inflate(LAYOUT, container, false);
-//
-//        RecyclerView rv = (RecyclerView) view.findViewById(R.id.recyclerView);
-//        rv.setLayoutManager(new LinearLayoutManager(context));
-//        rv.setAdapter(new RemindListAdapter(createMockRemindListData()) );
-//
-//        return view;
-//    }
-    // пока что заглушка (типа сервера), но это будет возращатся то что приходит с сервера
-    private List<GalleryItem> createMockRemindListData() {
-        List<GalleryItem> data = new ArrayList<>();
-
-        return data;
-    }
-
-//    public void setContext(Context context) {
-//        this.context = context;
-//    }
 }

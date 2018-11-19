@@ -16,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.example.justdoit.GalleryItem;
 import com.example.justdoit.R;
@@ -26,35 +25,30 @@ import com.example.justdoit.connect.ThumbnailDownloader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PageFragment extends Fragment {
-    public static final String ARG_PAGE = "ARG_PAGE";
-    private static final String TAG = "PhotoGalleryFragment";
+public class NewGalleryFragment extends Fragment {
+
+    private static final String TAG = "NewGalleryFragment";
 
     private RecyclerView mPhotoRecyclerView;
     private List<GalleryItem> mItems = new ArrayList<>();
-    private ThumbnailDownloader<PageFragment.PhotoHolder> mThumbnailDownloader;
+    private ThumbnailDownloader<NewGalleryFragment.PhotoHolder> mThumbnailDownloader;
 
-    private int mPage;
-
-    public static PageFragment newInstance(int page) {
-        Bundle args = new Bundle();
-        args.putInt(ARG_PAGE, page);
-        PageFragment fragment = new PageFragment();
-        fragment.setArguments(args);
-        return fragment;
+    public static NewGalleryFragment newInstance() {
+        return new NewGalleryFragment();
     }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        new PageFragment.FetchItemTask().execute();
+        new NewGalleryFragment.MyTask().execute();
 
         Handler responseHandler = new Handler();
         mThumbnailDownloader = new ThumbnailDownloader<>(responseHandler);
         mThumbnailDownloader.setThumbnailDownloadListener(
-                new ThumbnailDownloader.ThumbnailDownloadListener<PageFragment.PhotoHolder>() {
+                new ThumbnailDownloader.ThumbnailDownloadListener<NewGalleryFragment.PhotoHolder>() {
                     @Override
-                    public void onThumbnailDownloaded(PageFragment.PhotoHolder photoHolder, Bitmap bitmap) {
+                    public void onThumbnailDownloaded(NewGalleryFragment.PhotoHolder photoHolder, Bitmap bitmap) {
                         Drawable drawable = new BitmapDrawable(getResources(), bitmap);
                         photoHolder.bindDrawable(drawable);
                     }
@@ -95,7 +89,7 @@ public class PageFragment extends Fragment {
 
     private void setupAdapter() {
         if (isAdded()) {
-            mPhotoRecyclerView.setAdapter(new PageFragment.PhotoAdapter(mItems));
+            mPhotoRecyclerView.setAdapter(new NewGalleryFragment.PhotoAdapter(mItems));
         }
     }
 
@@ -114,7 +108,7 @@ public class PageFragment extends Fragment {
         }
     }
 
-    private class PhotoAdapter extends RecyclerView.Adapter<PageFragment.PhotoHolder> {
+    private class PhotoAdapter extends RecyclerView.Adapter<NewGalleryFragment.PhotoHolder> {
 
         private List<GalleryItem> mGalleryItems;
 
@@ -124,19 +118,16 @@ public class PageFragment extends Fragment {
 
         @NonNull
         @Override
-        public PageFragment.PhotoHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        public NewGalleryFragment.PhotoHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
             LayoutInflater inflater = LayoutInflater.from(getActivity());
             View view = inflater.inflate(R.layout.gallery_item, viewGroup, false);
-            return new PageFragment.PhotoHolder(view);
+            return new NewGalleryFragment.PhotoHolder(view);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull PageFragment.PhotoHolder photoHolder, int i) {
+        public void onBindViewHolder(@NonNull NewGalleryFragment.PhotoHolder photoHolder, int i) {
             GalleryItem galleryItem = mGalleryItems.get(i);
-            Drawable placeholder = getResources().getDrawable(R.drawable.bill_up_close);
-            photoHolder.bindDrawable(placeholder);
             mThumbnailDownloader.queueThumbnail(photoHolder, galleryItem.getUrl());
-            Log.i(TAG,"count img = "+getItemCount());
         }
 
         @Override
@@ -145,33 +136,21 @@ public class PageFragment extends Fragment {
         }
     }
 
-    private class FetchItemTask extends AsyncTask<Void, Void, List<GalleryItem>> {
+    private class MyTask extends AsyncTask<Void, Void, List<GalleryItem>> {
+
+        String response = null;
 
         @Override
         protected List<GalleryItem> doInBackground(Void... voids) {
-            return new FlickrFetchr().fetchItems();
+            return new FlickrFetchr().fetchItems("http://gallery.dev.webant.ru/api/photos?new=true");
         }
 
         @Override
         protected void onPostExecute(List<GalleryItem> items) {
             mItems = items;
             setupAdapter();
+            Log.i(TAG, String.valueOf(mItems));
         }
     }
-//    @Override public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        if (getArguments() != null) {
-//            mPage = getArguments().getInt(ARG_PAGE);
-//        }
-//    }
-//
-//    @Override public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-//                                       Bundle savedInstanceState) {
-//        View view = inflater.inflate(R.layout.fragment_page, container, false);
-//        TextView textView = (TextView) view;
-//        textView.setText("Fragment #" + mPage);
-//        return view;
-//    }
-
 
 }
