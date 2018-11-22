@@ -8,14 +8,19 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.GestureDetectorCompat;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.justdoit.adapter.SectionsPageAdapter;
@@ -31,8 +36,19 @@ import static com.example.justdoit.connect.CheckConnection.hasConnection;
 
 public class MainActivity extends SingleFragmentActivity {
 
+    //    //touch
+//    private GestureDetectorCompat lSwipeDetector;
+//
+//    TextView tvTxt;
+//    int i;
+//
+//    private static final int SWIPE_MIN_DISTANCE = 130;
+//    private static final int SWIPE_MAX_DISTANCE = 300;
+//    private static final int SWIPE_MIN_VELOCITY = 200;
+//
+//    //
     private static final String TAG = "MainActivity";
-    private static   Toolbar toolbar;
+    private static Toolbar toolbar;
     private SectionsPageAdapter mSectionsPageAdapter;
 
     private ViewPager mViewPager;
@@ -42,7 +58,7 @@ public class MainActivity extends SingleFragmentActivity {
 
     @Override
     protected Fragment createFragment() {
-        return  AllGalleryFragment.newInstance() ;
+        return AllGalleryFragment.newInstance();
     }
 
     @Override
@@ -52,29 +68,37 @@ public class MainActivity extends SingleFragmentActivity {
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.title_all);
+
         Button btn = new Button(this);
         btn.setText("click");
-        int check=1;
+        int check = 1;
         btn.setId(check);
         btn.setWidth(30);
         btn.setHeight(30);
         toolbar.addView(btn);
+
+//        tvTxt = new TextView(this);
+//        tvTxt.setWidth(50);
+//        tvTxt.setHeight(50);
+//        toolbar.addView(tvTxt);
+
         setSupportActionBar(toolbar);
 
-        final CoordinatorLayout mainLayout = (CoordinatorLayout)findViewById(R.id.main_content);
+
+        final CoordinatorLayout mainLayout = (CoordinatorLayout) findViewById(R.id.main_content);
         final ImageView imageView = new ImageView(MainActivity.this);
         imageView.setImageResource(R.drawable.not_connect);
 
         //timer
-        Runnable runnable = new Runnable(){
+        Runnable runnable = new Runnable() {
             public void run() {
                 // check fot connect
-                if( !hasConnection(MainActivity.this) ){
-                    Toast.makeText(MainActivity.this,"MainActivity connection is not found",Toast.LENGTH_SHORT).show();
+                if (!hasConnection(MainActivity.this)) {
+                    Toast.makeText(MainActivity.this, "MainActivity connection is not found", Toast.LENGTH_SHORT).show();
                 }
             }
         };
-        handler.postAtTime(runnable, System.currentTimeMillis()+interval);
+        handler.postAtTime(runnable, System.currentTimeMillis() + interval);
         handler.postDelayed(runnable, interval);
 
         Log.d(TAG, "OnCreate: Starting.");
@@ -90,51 +114,110 @@ public class MainActivity extends SingleFragmentActivity {
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                if( !hasConnection(MainActivity.this) ){
-//
-////                    LinearLayout.LayoutParams imageViewLayoutParams = new LinearLayout.LayoutParams(
-////                            LinearLayout.LayoutParams.MATCH_PARENT,
-////                            LinearLayout.LayoutParams.MATCH_PARENT);
-////                    imageView.setLayoutParams(imageViewLayoutParams);
-//
-////                    ViewPager viewPager = findViewById(R.id.container);
-////                    LinearLayout linearLayout = findViewById(R.id.fragment_container);
-////                    mainLayout.removeView(viewPager);
-////                    mainLayout.removeView(linearLayout);
-////                    mainLayout.removeAllViews();
-//                    mainLayout.addView(imageView);
-//                    Toast.makeText(MainActivity.this,"MainActivity connection is not found",Toast.LENGTH_SHORT).show();
-//                }else {
-//                    new FlickrFetchr();
-//                    mainLayout.removeView(imageView);
-//                    Toast.makeText(MainActivity.this,"click connect reload",Toast.LENGTH_SHORT).show();
-//                }
-            }
-        };
-
-        btn.setOnClickListener(listener);
-
-        if( !hasConnection(MainActivity.this) ){
+                if (!hasConnection(MainActivity.this)) {
 
 //                    LinearLayout.LayoutParams imageViewLayoutParams = new LinearLayout.LayoutParams(
 //                            LinearLayout.LayoutParams.MATCH_PARENT,
 //                            LinearLayout.LayoutParams.MATCH_PARENT);
 //                    imageView.setLayoutParams(imageViewLayoutParams);
 
-//                    ViewPager viewPager = findViewById(R.id.container);
-//                    LinearLayout linearLayout = findViewById(R.id.fragment_container);
-//                    mainLayout.removeView(viewPager);
-//                    mainLayout.removeView(linearLayout);
-//                    mainLayout.removeAllViews();
+                    ViewPager viewPager = findViewById(R.id.container);
+                    LinearLayout linearLayout = findViewById(R.id.fragment_container);
+                    viewPager.setVisibility(View.INVISIBLE);
+                    linearLayout.setVisibility(View.INVISIBLE);
+                    mainLayout.removeView(imageView);
+                    mainLayout.addView(imageView);
+                    Toast.makeText(MainActivity.this, "MainActivity connection is not found", Toast.LENGTH_SHORT).show();
+                } else {
+                    new FlickrFetchr();
+                    ViewPager viewPager = findViewById(R.id.container);
+                    LinearLayout linearLayout = findViewById(R.id.fragment_container);
+                    viewPager.setVisibility(View.VISIBLE);
+                    linearLayout.setVisibility(View.VISIBLE);
+                    mainLayout.removeView(imageView);
+                    Toast.makeText(MainActivity.this, "click connect reload", Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+
+        btn.setOnClickListener(listener);
+
+        if (!hasConnection(MainActivity.this)) {
+            ViewPager viewPager = findViewById(R.id.container);
+            LinearLayout linearLayout = findViewById(R.id.fragment_container);
+            viewPager.setVisibility(View.INVISIBLE);
+            linearLayout.setVisibility(View.INVISIBLE);
             mainLayout.addView(imageView);
-            Toast.makeText(MainActivity.this,"MainActivity connection is not found",Toast.LENGTH_SHORT).show();
-        }else {
+            Toast.makeText(MainActivity.this, "MainActivity connection is not found", Toast.LENGTH_SHORT).show();
+        } else {
             new FlickrFetchr();
-            mainLayout.removeView(imageView);
-            Toast.makeText(MainActivity.this,"click connect reload",Toast.LENGTH_SHORT).show();
+            ViewPager viewPager = findViewById(R.id.container);
+            LinearLayout linearLayout = findViewById(R.id.fragment_container);
+            viewPager.setVisibility(View.VISIBLE);
+            linearLayout.setVisibility(View.VISIBLE);
+            imageView.setVisibility(View.VISIBLE);
+            Toast.makeText(MainActivity.this, "click connect reload", Toast.LENGTH_SHORT).show();
         }
+        //toutch
+//        i = 1;
+//        lSwipeDetector = new GestureDetectorCompat(this, new MyGestureListener());
+//
+//        tvTxt.setText("" + i);
+
+//        mainLayout.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                return lSwipeDetector.onTouchEvent(event);
+//            }
+//        });
+
     }
 
+    // This example shows an Activity, but you would use the same approach if
+// you were subclassing a View.
+//
+//    private class MyGestureListener extends GestureDetector.SimpleOnGestureListener{
+//        @Override
+//        public boolean onDown(MotionEvent e) {
+//            return true;
+//        }
+//        @Override
+//        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY){
+//            if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_DISTANCE)
+//                return false;
+//            if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_MIN_VELOCITY) {
+//                i++;
+//                tvTxt.setText("" + i);
+//            }
+//            return false;
+//        }
+//    }
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event){
+//
+//        int action = MotionEventCompat.getActionMasked(event);
+//
+//        switch(action) {
+//            case (MotionEvent.ACTION_DOWN) :
+//                Log.d(TAG,"Action was DOWN");
+//                return true;
+//            case (MotionEvent.ACTION_MOVE) :
+//                Log.d(TAG,"Action was MOVE");
+//                return true;
+//            case (MotionEvent.ACTION_UP) :
+//                Log.d(TAG,"Action was UP");
+//                return true;
+//            case (MotionEvent.ACTION_CANCEL) :
+//                Log.d(TAG,"Action was CANCEL");
+//                return true;
+//            case (MotionEvent.ACTION_OUTSIDE) :
+//                Log.d(TAG,"Movement occurred outside bounds " +
+//                        "of current screen element");
+//                return true;
+//            default :
+//                return super.onTouchEvent(event);
+//        }
+//    }
     private void setupViewPager(ViewPager viewPager) {
         SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager());
 //        adapter.addFragment(new AllGalleryFragment(), "All");
