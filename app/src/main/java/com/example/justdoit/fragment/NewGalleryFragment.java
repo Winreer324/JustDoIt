@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,12 +19,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.example.justdoit.GalleryItem;
+import com.example.justdoit.MainActivity;
 import com.example.justdoit.R;
 import com.example.justdoit.connect.FlickrFetchr;
 import com.example.justdoit.connect.ThumbnailDownloader;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class NewGalleryFragment extends Fragment {
 
@@ -54,7 +57,6 @@ public class NewGalleryFragment extends Fragment {
                     }
                 }
         );
-
         mThumbnailDownloader.start();
         mThumbnailDownloader.getLooper();
         Log.i(TAG, "Background thread started");
@@ -121,6 +123,7 @@ public class NewGalleryFragment extends Fragment {
         public NewGalleryFragment.PhotoHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
             LayoutInflater inflater = LayoutInflater.from(getActivity());
             View view = inflater.inflate(R.layout.gallery_item, viewGroup, false);
+//            View view = inflater.inflate(R.layout.not_connection, viewGroup, false);
             return new NewGalleryFragment.PhotoHolder(view);
         }
 
@@ -137,8 +140,6 @@ public class NewGalleryFragment extends Fragment {
     }
 
     private class MyTask extends AsyncTask<Void, Void, List<GalleryItem>> {
-
-        String response = null;
 
         @Override
         protected List<GalleryItem> doInBackground(Void... voids) {

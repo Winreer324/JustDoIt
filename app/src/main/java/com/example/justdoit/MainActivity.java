@@ -1,33 +1,81 @@
 package com.example.justdoit;
 
+import android.app.FragmentTransaction;
+import android.media.Image;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.example.justdoit.adapter.SectionsPageAdapter;
+import com.example.justdoit.connect.CheckConnection;
+import com.example.justdoit.connect.FlickrFetchr;
+import com.example.justdoit.connect.ThumbnailDownloader;
 import com.example.justdoit.fragment.AllGalleryFragment;
 import com.example.justdoit.fragment.NewGalleryFragment;
+import com.example.justdoit.fragment.NotConnection;
 import com.example.justdoit.fragment.PopularGalleryFragment;
+
+import static com.example.justdoit.connect.CheckConnection.hasConnection;
 
 public class MainActivity extends SingleFragmentActivity {
 
     private static final String TAG = "MainActivity";
-
+    private static   Toolbar toolbar;
     private SectionsPageAdapter mSectionsPageAdapter;
 
     private ViewPager mViewPager;
+    // timer
+    private final int interval = 2500; //   Second
+    private Handler handler = new Handler();
 
     @Override
     protected Fragment createFragment() {
-        return  AllGalleryFragment.newInstance();
+        return  AllGalleryFragment.newInstance() ;
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.title_all);
+        Button btn = new Button(this);
+        btn.setText("click");
+        int check=1;
+        btn.setId(check);
+        btn.setWidth(30);
+        btn.setHeight(30);
+        toolbar.addView(btn);
+        setSupportActionBar(toolbar);
+
+        final CoordinatorLayout mainLayout = (CoordinatorLayout)findViewById(R.id.main_content);
+        final ImageView imageView = new ImageView(MainActivity.this);
+        imageView.setImageResource(R.drawable.not_connect);
+
+        //timer
+        Runnable runnable = new Runnable(){
+            public void run() {
+                // check fot connect
+                if( !hasConnection(MainActivity.this) ){
+                    Toast.makeText(MainActivity.this,"MainActivity connection is not found",Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+        handler.postAtTime(runnable, System.currentTimeMillis()+interval);
+        handler.postDelayed(runnable, interval);
 
         Log.d(TAG, "OnCreate: Starting.");
 
@@ -37,16 +85,63 @@ public class MainActivity extends SingleFragmentActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+
+
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                if( !hasConnection(MainActivity.this) ){
+//
+////                    LinearLayout.LayoutParams imageViewLayoutParams = new LinearLayout.LayoutParams(
+////                            LinearLayout.LayoutParams.MATCH_PARENT,
+////                            LinearLayout.LayoutParams.MATCH_PARENT);
+////                    imageView.setLayoutParams(imageViewLayoutParams);
+//
+////                    ViewPager viewPager = findViewById(R.id.container);
+////                    LinearLayout linearLayout = findViewById(R.id.fragment_container);
+////                    mainLayout.removeView(viewPager);
+////                    mainLayout.removeView(linearLayout);
+////                    mainLayout.removeAllViews();
+//                    mainLayout.addView(imageView);
+//                    Toast.makeText(MainActivity.this,"MainActivity connection is not found",Toast.LENGTH_SHORT).show();
+//                }else {
+//                    new FlickrFetchr();
+//                    mainLayout.removeView(imageView);
+//                    Toast.makeText(MainActivity.this,"click connect reload",Toast.LENGTH_SHORT).show();
+//                }
+            }
+        };
+
+        btn.setOnClickListener(listener);
+
+        if( !hasConnection(MainActivity.this) ){
+
+//                    LinearLayout.LayoutParams imageViewLayoutParams = new LinearLayout.LayoutParams(
+//                            LinearLayout.LayoutParams.MATCH_PARENT,
+//                            LinearLayout.LayoutParams.MATCH_PARENT);
+//                    imageView.setLayoutParams(imageViewLayoutParams);
+
+//                    ViewPager viewPager = findViewById(R.id.container);
+//                    LinearLayout linearLayout = findViewById(R.id.fragment_container);
+//                    mainLayout.removeView(viewPager);
+//                    mainLayout.removeView(linearLayout);
+//                    mainLayout.removeAllViews();
+            mainLayout.addView(imageView);
+            Toast.makeText(MainActivity.this,"MainActivity connection is not found",Toast.LENGTH_SHORT).show();
+        }else {
+            new FlickrFetchr();
+            mainLayout.removeView(imageView);
+            Toast.makeText(MainActivity.this,"click connect reload",Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void setupViewPager(ViewPager viewPager) {
         SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager());
-        adapter.addFragment(new AllGalleryFragment(), "All");
-        adapter.addFragment(new PopularGalleryFragment(), "Popular",R.drawable.fire);
-        adapter.addFragment(new NewGalleryFragment(), "New",R.drawable.file_document_box);
+//        adapter.addFragment(new AllGalleryFragment(), "All");
+        adapter.addFragment(new PopularGalleryFragment(), "Popular");
+        adapter.addFragment(new NewGalleryFragment(), "New");
         viewPager.setAdapter(adapter);
     }
-
 }
 
 

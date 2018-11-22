@@ -1,6 +1,7 @@
 package com.example.justdoit.connect;
 
 import android.util.Log;
+import android.widget.ImageView;
 
 import com.example.justdoit.GalleryItem;
 
@@ -87,6 +88,7 @@ public class FlickrFetchr {
                 String contentUrl = image.getString("contentUrl");
 
                 item.setUrl(item.getUrl() + contentUrl);
+
                 items.add(item);
             }
 

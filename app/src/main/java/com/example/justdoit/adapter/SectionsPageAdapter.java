@@ -5,8 +5,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import com.example.justdoit.MainActivity;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.example.justdoit.connect.CheckConnection.hasConnection;
 
 public class SectionsPageAdapter extends FragmentPagerAdapter {
 
@@ -17,12 +21,7 @@ public class SectionsPageAdapter extends FragmentPagerAdapter {
     public void addFragment(Fragment fragment, String title) {
         mFragmentList.add(fragment);
         mFragmentTitleList.add(title);
-    }
 
-    public void addFragment(Fragment fragment, String title,int icon) {
-        mFragmentList.add(fragment);
-        mFragmentTitleList.add(title);
-//        mFragmentIconList.add(icon);
     }
 
     public SectionsPageAdapter(FragmentManager fm) {

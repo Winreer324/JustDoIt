@@ -16,4 +16,7 @@
     <string name="tab_item_todo">Важные</string>
     <string name="tab_item_birthdays">Дни рождения</string>
 
+    <string name="title_new">New</string>
+    <string name="title_populary">Populary</string>
+    <string name="title_all">All</string>
 </resources>
